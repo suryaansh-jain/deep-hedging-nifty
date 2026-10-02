@@ -7,12 +7,14 @@
       "cost_bps": 0.0,
       "sigma0": 0.1953307622985559,
       "premium": 0.025235882581654878,
+      "include_running_pnl": true,
+      "batch_size": 25000,
       "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-      "best_epoch": 113,
-      "epochs_run": 139,
-      "best_val_cvar": 0.03099430911242962,
-      "best_val_cvar_x_premium": 1.2281840752802047,
-      "seconds": 94.4832558631897
+      "best_epoch": 135,
+      "epochs_run": 161,
+      "best_val_cvar": 0.030841397121548653,
+      "best_val_cvar_x_premium": 1.222124767055648,
+      "seconds": 121.42538690567017
     },
     "mlp_garch_2bps": {
       "policy": "mlp",
@@ -20,12 +22,14 @@
       "cost_bps": 2.0,
       "sigma0": 0.1953307622985559,
       "premium": 0.025235882581654878,
+      "include_running_pnl": true,
+      "batch_size": 25000,
       "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-      "best_epoch": 112,
-      "epochs_run": 138,
-      "best_val_cvar": 0.031497690826654434,
-      "best_val_cvar_x_premium": 1.2481311372700534,
-      "seconds": 95.0198929309845
+      "best_epoch": 60,
+      "epochs_run": 86,
+      "best_val_cvar": 0.031350381672382355,
+      "best_val_cvar_x_premium": 1.2422938476965488,
+      "seconds": 64.44192695617676
     },
     "mlp_garch_5bps": {
       "policy": "mlp",
@@ -33,12 +37,14 @@
       "cost_bps": 5.0,
       "sigma0": 0.1953307622985559,
       "premium": 0.025235882581654878,
+      "include_running_pnl": true,
+      "batch_size": 25000,
       "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-      "best_epoch": 112,
-      "epochs_run": 138,
-      "best_val_cvar": 0.03227204829454422,
-      "best_val_cvar_x_premium": 1.2788159157946095,
-      "seconds": 91.9854531288147
+      "best_epoch": 81,
+      "epochs_run": 107,
+      "best_val_cvar": 0.032107509672641754,
+      "best_val_cvar_x_premium": 1.2722958893453633,
+      "seconds": 81.32713031768799
     },
     "mlp_garch_10bps": {
       "policy": "mlp",
@@ -46,12 +52,14 @@
       "cost_bps": 10.0,
       "sigma0": 0.1953307622985559,
       "premium": 0.025235882581654878,
+      "include_running_pnl": true,
+      "batch_size": 25000,
       "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-      "best_epoch": 112,
-      "epochs_run": 138,
-      "best_val_cvar": 0.033447109162807465,
-      "best_val_cvar_x_premium": 1.3253790135765533,
-      "seconds": 93.12167286872864
+      "best_epoch": 116,
+      "epochs_run": 142,
+      "best_val_cvar": 0.03253758326172829,
+      "best_val_cvar_x_premium": 1.2893380350953665,
+      "seconds": 112.2199399471283
     },
     "mlp_garch_25bps": {
       "policy": "mlp",
@@ -59,12 +67,14 @@
       "cost_bps": 25.0,
       "sigma0": 0.1953307622985559,
       "premium": 0.025235882581654878,
+      "include_running_pnl": true,
+      "batch_size": 25000,
       "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-      "best_epoch": 112,
-      "epochs_run": 138,
-      "best_val_cvar": 0.03696615621447563,
-      "best_val_cvar_x_premium": 1.4648251787852282,
-      "seconds": 90.98397016525269
+      "best_epoch": 104,
+      "epochs_run": 130,
+      "best_val_cvar": 0.036296047270298004,
+      "best_val_cvar_x_premium": 1.4382713643105658,
+      "seconds": 98.39699912071228
     },
     "mlp_garch_50bps": {
       "policy": "mlp",
@@ -72,12 +82,14 @@
       "cost_bps": 50.0,
       "sigma0": 0.1953307622985559,
       "premium": 0.025235882581654878,
+      "include_running_pnl": true,
+      "batch_size": 25000,
       "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-      "best_epoch": 132,
-      "epochs_run": 158,
-      "best_val_cvar": 0.04210660234093666,
-      "best_val_cvar_x_premium": 1.6685210911365502,
-      "seconds": 111.28286910057068
+      "best_epoch": 131,
+      "epochs_run": 157,
+      "best_val_cvar": 0.041257575154304504,
+      "best_val_cvar_x_premium": 1.634877441706617,
+      "seconds": 122.60687589645386
     },
     "ntb_garch_0bps": {
       "policy": "ntb",
@@ -85,12 +97,14 @@
       "cost_bps": 0.0,
       "sigma0": 0.1953307622985559,
       "premium": 0.025235882581654878,
+      "include_running_pnl": true,
+      "batch_size": 25000,
       "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-      "best_epoch": 80,
-      "epochs_run": 106,
-      "best_val_cvar": 0.030883289873600006,
-      "best_val_cvar_x_premium": 1.2237848140904923,
-      "seconds": 78.04390621185303
+      "best_epoch": 118,
+      "epochs_run": 144,
+      "best_val_cvar": 0.030239326879382133,
+      "best_val_cvar_x_premium": 1.1982670620509421,
+      "seconds": 125.96265983581543
     },
     "ntb_garch_2bps": {
       "policy": "ntb",
@@ -98,12 +112,14 @@
       "cost_bps": 2.0,
       "sigma0": 0.1953307622985559,
       "premium": 0.025235882581654878,
+      "include_running_pnl": true,
+      "batch_size": 25000,
       "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-      "best_epoch": 97,
-      "epochs_run": 123,
-      "best_val_cvar": 0.031404197216033936,
-      "best_val_cvar_x_premium": 1.2444263486494065,
-      "seconds": 89.85101389884949
+      "best_epoch": 88,
+      "epochs_run": 114,
+      "best_val_cvar": 0.03077371045947075,
+      "best_val_cvar_x_premium": 1.2194426075607743,
+      "seconds": 102.33603405952454
     },
     "ntb_garch_5bps": {
       "policy": "ntb",
@@ -111,12 +127,14 @@
       "cost_bps": 5.0,
       "sigma0": 0.1953307622985559,
       "premium": 0.025235882581654878,
+      "include_running_pnl": true,
+      "batch_size": 25000,
       "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-      "best_epoch": 86,
-      "epochs_run": 112,
-      "best_val_cvar": 0.03214007243514061,
-      "best_val_cvar_x_premium": 1.2735862251358192,
-      "seconds": 82.24724102020264
+      "best_epoch": 93,
+      "epochs_run": 119,
+      "best_val_cvar": 0.030651496723294258,
+      "best_val_cvar_x_premium": 1.2145997519253096,
+      "seconds": 102.59373593330383
     },
     "ntb_garch_10bps": {
       "policy": "ntb",
@@ -124,12 +142,14 @@
       "cost_bps": 10.0,
       "sigma0": 0.1953307622985559,
       "premium": 0.025235882581654878,
+      "include_running_pnl": true,
+      "batch_size": 25000,
       "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-      "best_epoch": 101,
-      "epochs_run": 127,
-      "best_val_cvar": 0.03309793397784233,
-      "best_val_cvar_x_premium": 1.3115425573386816,
-      "seconds": 95.35344409942627
+      "best_epoch": 55,
+      "epochs_run": 81,
+      "best_val_cvar": 0.03267441689968109,
+      "best_val_cvar_x_premium": 1.2947602206484201,
+      "seconds": 69.62128710746765
     },
     "ntb_garch_25bps": {
       "policy": "ntb",
@@ -137,12 +157,14 @@
       "cost_bps": 25.0,
       "sigma0": 0.1953307622985559,
       "premium": 0.025235882581654878,
+      "include_running_pnl": true,
+      "batch_size": 25000,
       "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-      "best_epoch": 39,
-      "epochs_run": 65,
-      "best_val_cvar": 0.0365716889500618,
-      "best_val_cvar_x_premium": 1.4491939733721633,
-      "seconds": 47.18635392189026
+      "best_epoch": 107,
+      "epochs_run": 133,
+      "best_val_cvar": 0.03529223054647446,
+      "best_val_cvar_x_premium": 1.398494006788968,
+      "seconds": 114.9987211227417
     },
     "ntb_garch_50bps": {
       "policy": "ntb",
@@ -150,12 +172,14 @@
       "cost_bps": 50.0,
       "sigma0": 0.1953307622985559,
       "premium": 0.025235882581654878,
+      "include_running_pnl": true,
+      "batch_size": 25000,
       "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-      "best_epoch": 111,
-      "epochs_run": 137,
-      "best_val_cvar": 0.04126640781760216,
-      "best_val_cvar_x_premium": 1.6352274458433487,
-      "seconds": 100.28239703178406
+      "best_epoch": 118,
+      "epochs_run": 144,
+      "best_val_cvar": 0.04036972299218178,
+      "best_val_cvar_x_premium": 1.5996953093104176,
+      "seconds": 125.04642009735107
     },
     "ntb_heston_0bps": {
       "policy": "ntb",
@@ -163,12 +187,14 @@
       "cost_bps": 0.0,
       "sigma0": 0.1953307622985559,
       "premium": 0.025235882581654878,
+      "include_running_pnl": true,
+      "batch_size": 25000,
       "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-      "best_epoch": 99,
-      "epochs_run": 125,
-      "best_val_cvar": 0.014257267117500305,
-      "best_val_cvar_x_premium": 0.5649601146846581,
-      "seconds": 73.77227282524109
+      "best_epoch": 114,
+      "epochs_run": 140,
+      "best_val_cvar": 0.013685548678040504,
+      "best_val_cvar_x_premium": 0.5423051337221373,
+      "seconds": 94.99478387832642
     },
     "ntb_heston_2bps": {
       "policy": "ntb",
@@ -176,12 +202,14 @@
       "cost_bps": 2.0,
       "sigma0": 0.1953307622985559,
       "premium": 0.025235882581654878,
+      "include_running_pnl": true,
+      "batch_size": 25000,
       "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-      "best_epoch": 38,
-      "epochs_run": 64,
-      "best_val_cvar": 0.014767243526875973,
-      "best_val_cvar_x_premium": 0.585168498826784,
-      "seconds": 40.1593861579895
+      "best_epoch": 113,
+      "epochs_run": 139,
+      "best_val_cvar": 0.014186755754053593,
+      "best_val_cvar_x_premium": 0.5621660232468587,
+      "seconds": 94.59261727333069
     },
     "ntb_heston_5bps": {
       "policy": "ntb",
@@ -189,12 +217,14 @@
       "cost_bps": 5.0,
       "sigma0": 0.1953307622985559,
       "premium": 0.025235882581654878,
+      "include_running_pnl": true,
+      "batch_size": 25000,
       "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-      "best_epoch": 40,
-      "epochs_run": 66,
-      "best_val_cvar": 0.015517900697886944,
-      "best_val_cvar_x_premium": 0.6149141266478875,
-      "seconds": 40.741106271743774
+      "best_epoch": 140,
+      "epochs_run": 166,
+      "best_val_cvar": 0.014944369904696941,
+      "best_val_cvar_x_premium": 0.5921873291469778,
+      "seconds": 114.03516697883606
     },
     "ntb_heston_10bps": {
       "policy": "ntb",
@@ -202,12 +232,14 @@
       "cost_bps": 10.0,
       "sigma0": 0.1953307622985559,
       "premium": 0.025235882581654878,
+      "include_running_pnl": true,
+      "batch_size": 25000,
       "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-      "best_epoch": 43,
-      "epochs_run": 69,
-      "best_val_cvar": 0.01674048975110054,
-      "best_val_cvar_x_premium": 0.6633605817800868,
-      "seconds": 42.987643241882324
+      "best_epoch": 125,
+      "epochs_run": 151,
+      "best_val_cvar": 0.016178971156477928,
+      "best_val_cvar_x_premium": 0.6411097810480052,
+      "seconds": 102.5821750164032
     },
     "ntb_heston_25bps": {
       "policy": "ntb",
@@ -215,12 +247,14 @@
       "cost_bps": 25.0,
       "sigma0": 0.1953307622985559,
       "premium": 0.025235882581654878,
+      "include_running_pnl": true,
+      "batch_size": 25000,
       "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-      "best_epoch": 56,
-      "epochs_run": 82,
-      "best_val_cvar": 0.020209331065416336,
-      "best_val_cvar_x_premium": 0.8008172886375461,
-      "seconds": 52.381799936294556
+      "best_epoch": 182,
+      "epochs_run": 208,
+      "best_val_cvar": 0.019462158903479576,
+      "best_val_cvar_x_premium": 0.7712097581888225,
+      "seconds": 146.26513385772705
     },
     "ntb_heston_50bps": {
       "policy": "ntb",
@@ -228,12 +262,14 @@
       "cost_bps": 50.0,
       "sigma0": 0.1953307622985559,
       "premium": 0.025235882581654878,
+      "include_running_pnl": true,
+      "batch_size": 25000,
       "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-      "best_epoch": 107,
-      "epochs_run": 133,
-      "best_val_cvar": 0.02556837908923626,
-      "best_val_cvar_x_premium": 1.0131755450401045,
-      "seconds": 82.00183081626892
+      "best_epoch": 148,
+      "epochs_run": 174,
+      "best_val_cvar": 0.02465716190636158,
+      "best_val_cvar_x_premium": 0.9770675476310071,
+      "seconds": 122.90457201004028
     }
   }
 }

@@ -4,8 +4,10 @@
   "cost_bps": 10.0,
   "sigma0": 0.1953307622985559,
   "premium": 0.025235882581654878,
+  "include_running_pnl": true,
+  "batch_size": 25000,
   "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-  "best_epoch": 43,
-  "best_val_cvar": 0.01674048975110054,
-  "seconds": 42.987643241882324
+  "best_epoch": 125,
+  "best_val_cvar": 0.016178971156477928,
+  "seconds": 102.5821750164032
 }
