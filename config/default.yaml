@@ -13,7 +13,7 @@ data:
   nifty_ticker: "^NSEI"
   vix_ticker: "^INDIAVIX"
   start_date: "2007-09-17"
-  end_date: null
+  end_date: "2026-10-02"
   test_start_date: "2020-01-01"
 
 option:
