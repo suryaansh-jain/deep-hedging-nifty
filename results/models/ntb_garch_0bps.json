@@ -1,0 +1,11 @@
+{
+  "policy": "ntb",
+  "simulator": "garch",
+  "cost_bps": 0.0,
+  "sigma0": 0.1953307622985559,
+  "premium": 0.025235882581654878,
+  "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
+  "best_epoch": 80,
+  "best_val_cvar": 0.030883289873600006,
+  "seconds": 78.04390621185303
+}
