@@ -1,0 +1,11 @@
+numpy>=1.26
+pandas>=2.1
+scipy>=1.11
+torch>=2.2
+arch>=6.3
+yfinance>=0.2.40
+streamlit>=1.35
+plotly>=5.20
+matplotlib>=3.8
+pytest>=8.0
+PyYAML>=6.0

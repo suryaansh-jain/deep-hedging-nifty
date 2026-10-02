@@ -1,0 +1,87 @@
+seed: 42
+device: auto
+
+paths:
+  raw: data/raw
+  processed: data/processed
+  models: results/models
+  metrics: results/metrics
+  figures: results/figures
+  validation: results/validation
+
+data:
+  nifty_ticker: "^NSEI"
+  vix_ticker: "^INDIAVIX"
+  start_date: "2007-09-17"
+  end_date: null
+  test_start_date: "2020-01-01"
+
+option:
+  maturity_days: 21
+  trading_days_per_year: 252
+  r: 0.065
+  sigma0: auto
+
+costs:
+  cost_bps: 5
+  cost_grid: [0, 2, 5, 10, 25, 50]
+
+risk:
+  alpha: 0.95
+
+simulation:
+  n_train_paths: 50000
+  n_val_paths: 20000
+  n_test_paths: 100000
+  val_seed: 20001
+  test_seed: 30001
+  train_seed_base: 100000
+
+gbm:
+  sigma: 0.18
+  mu: 0.065
+
+garch:
+  burn_in: 250
+
+heston:
+  kappa: 3.0
+  xi: 0.4
+  rho: -0.7
+  theta: auto
+  v0: auto
+  substeps_per_day: 4
+  mu: 0.065
+
+baselines:
+  band_grid: [0.0, 0.01, 0.02, 0.03, 0.05, 0.075, 0.1, 0.15, 0.2, 0.3]
+
+policy:
+  hidden_size: 64
+  hidden_layers: 3
+
+training:
+  max_epochs: 200
+  batch_size: 5000
+  learning_rate: 0.001
+  weight_decay: 0.0
+  grad_clip: 1.0
+  patience: 25
+  lr_factor: 0.5
+  lr_patience: 8
+  min_lr: 0.00001
+  policies: [mlp, ntb]
+  heston_policy: ntb
+
+validation:
+  rebalance:
+    n_paths: 50000
+    fine_steps: 84
+    rebalance_counts: [1, 2, 4, 7, 21, 84]
+    sigma: 0.18
+    seed: 777
+    tolerance: 0.25
+  gbm:
+    n_test_paths: 20000
+    test_seed: 40001
+    target_mad: 0.05
