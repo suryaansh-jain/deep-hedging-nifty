@@ -44,18 +44,32 @@ def delta_matrix(prices: np.ndarray, times: np.ndarray, rate: float, sigma: floa
     return call_delta_np(prices[:, :-1], 1.0, time_to_maturity[None, :], rate, sigma)
 
 
-def bucket_table(absolute_difference: np.ndarray, prices: np.ndarray, n_steps: int) -> tuple[pd.DataFrame, pd.DataFrame]:
+def bucket_table(signed_difference: np.ndarray, prices: np.ndarray, n_steps: int) -> tuple[pd.DataFrame, pd.DataFrame]:
+    absolute_difference = np.abs(signed_difference)
     days_to_expiry = n_steps - np.arange(n_steps)
     expiry_rows = []
     for upper, lower in EXPIRY_BUCKETS:
         mask = (days_to_expiry <= upper) & (days_to_expiry >= lower)
-        values = absolute_difference[:, mask]
-        expiry_rows.append({"days_to_expiry": f"{lower}-{upper}" if lower != upper else f"{lower}", "count": values.size, "mad": values.mean()})
+        expiry_rows.append(
+            {
+                "days_to_expiry": f"{lower}-{upper}" if lower != upper else f"{lower}",
+                "count": absolute_difference[:, mask].size,
+                "mad": absolute_difference[:, mask].mean(),
+                "mean_learned_minus_delta": signed_difference[:, mask].mean(),
+            }
+        )
     log_moneyness = np.log(prices[:, :-1])
     moneyness_rows = []
     for lower, upper in zip(MONEYNESS_EDGES[:-1], MONEYNESS_EDGES[1:]):
         mask = (log_moneyness >= lower) & (log_moneyness < upper)
-        moneyness_rows.append({"ln_S_over_K": f"[{lower:g}, {upper:g})", "count": int(mask.sum()), "mad": absolute_difference[mask].mean() if mask.any() else np.nan})
+        moneyness_rows.append(
+            {
+                "ln_S_over_K": f"[{lower:g}, {upper:g})",
+                "count": int(mask.sum()),
+                "mad": absolute_difference[mask].mean() if mask.any() else np.nan,
+                "mean_learned_minus_delta": signed_difference[mask].mean() if mask.any() else np.nan,
+            }
+        )
     return pd.DataFrame(expiry_rows), pd.DataFrame(moneyness_rows)
 
 
@@ -111,10 +125,11 @@ def run_gbm_validation(config: Config) -> GbmValidationOutcome:
     prices_double, volatility_double = test.to_torch(device="cpu", dtype=torch.float64)
     delta_outcome = run_policy(DeltaHedgePolicy(), prices_double, test.times, volatility_double, premium, 1.0, rate, 0.0)
     delta_pnl = delta_outcome.pnl.numpy()
-    absolute_difference = np.abs(learned - deltas)
+    signed_difference = learned - deltas
+    absolute_difference = np.abs(signed_difference)
     mad = float(absolute_difference.mean())
     passed = mad < settings_gbm.target_mad
-    expiry_table, moneyness_table = bucket_table(absolute_difference, test.prices, test.prices.shape[1] - 1)
+    expiry_table, moneyness_table = bucket_table(signed_difference, test.prices, test.prices.shape[1] - 1)
     alpha = config.risk.alpha
     pnl_table = pd.DataFrame(
         [
