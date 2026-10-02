@@ -20,6 +20,8 @@ class HedgeState:
     volatility: torch.Tensor
     strike: float
     rate: float
+    wealth: torch.Tensor
+    premium: float
 
 
 Policy = Callable[[HedgeState], torch.Tensor]
@@ -86,6 +88,8 @@ def run_hedge(
             volatility=volatility[:, step],
             strike=strike,
             rate=rate,
+            wealth=cash + h_prev * spot,
+            premium=float(premium),
         )
         h_new = policy(state)
         trade = h_new - h_prev

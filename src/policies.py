@@ -6,6 +6,7 @@ import torch
 from torch import nn
 
 from baselines import bs_delta_for_state
+from black_scholes import call_price_torch
 from hedging_env import HedgeState
 
 
@@ -15,6 +16,11 @@ def log_moneyness_scaled(state: HedgeState, sigma0: float) -> torch.Tensor:
 
 def time_fraction(state: HedgeState) -> torch.Tensor:
     return torch.full_like(state.spot, state.time / state.maturity)
+
+
+def running_pnl_scaled(state: HedgeState) -> torch.Tensor:
+    option_value = call_price_torch(state.spot, state.strike, state.time_to_maturity, state.rate, state.volatility)
+    return (state.wealth - option_value) / state.premium
 
 
 def build_mlp(input_size: int, output_size: int, hidden_size: int, hidden_layers: int) -> nn.Sequential:
@@ -29,24 +35,26 @@ def build_mlp(input_size: int, output_size: int, hidden_size: int, hidden_layers
 
 class MLPPolicy(nn.Module):
     name = "mlp"
-    feature_names = ("t_over_T", "log_moneyness_scaled", "h_prev", "sigma_scaled", "bs_delta")
+    base_feature_names = ("t_over_T", "log_moneyness_scaled", "h_prev", "sigma_scaled", "bs_delta")
 
-    def __init__(self, sigma0: float, hidden_size: int = 64, hidden_layers: int = 3) -> None:
+    def __init__(self, sigma0: float, hidden_size: int = 64, hidden_layers: int = 3, include_running_pnl: bool = False) -> None:
         super().__init__()
         self.sigma0 = sigma0
+        self.include_running_pnl = include_running_pnl
+        self.feature_names = self.base_feature_names + (("running_pnl_scaled",) if include_running_pnl else ())
         self.network = build_mlp(len(self.feature_names), 1, hidden_size, hidden_layers)
 
     def features(self, state: HedgeState) -> torch.Tensor:
-        return torch.stack(
-            [
-                time_fraction(state),
-                log_moneyness_scaled(state, self.sigma0),
-                state.h_prev,
-                state.volatility / self.sigma0,
-                bs_delta_for_state(state),
-            ],
-            dim=1,
-        )
+        columns = [
+            time_fraction(state),
+            log_moneyness_scaled(state, self.sigma0),
+            state.h_prev,
+            state.volatility / self.sigma0,
+            bs_delta_for_state(state),
+        ]
+        if self.include_running_pnl:
+            columns.append(running_pnl_scaled(state))
+        return torch.stack(columns, dim=1)
 
     def forward(self, state: HedgeState) -> torch.Tensor:
         return torch.sigmoid(self.network(self.features(state)).squeeze(1))
@@ -54,12 +62,14 @@ class MLPPolicy(nn.Module):
 
 class NoTransactionBandPolicy(nn.Module):
     name = "ntb"
-    feature_names = ("t_over_T", "log_moneyness_scaled", "sigma_scaled", "bs_delta")
+    base_feature_names = ("t_over_T", "log_moneyness_scaled", "sigma_scaled", "bs_delta")
     initial_band_logit = -3.0
 
-    def __init__(self, sigma0: float, hidden_size: int = 64, hidden_layers: int = 3) -> None:
+    def __init__(self, sigma0: float, hidden_size: int = 64, hidden_layers: int = 3, include_running_pnl: bool = False) -> None:
         super().__init__()
         self.sigma0 = sigma0
+        self.include_running_pnl = include_running_pnl
+        self.feature_names = self.base_feature_names + (("running_pnl_scaled",) if include_running_pnl else ())
         self.network = build_mlp(len(self.feature_names), 3, hidden_size, hidden_layers)
         final_layer = self.network[-1]
         nn.init.zeros_(final_layer.weight)
@@ -68,11 +78,10 @@ class NoTransactionBandPolicy(nn.Module):
 
     def features(self, state: HedgeState) -> tuple[torch.Tensor, torch.Tensor]:
         delta = bs_delta_for_state(state)
-        stacked = torch.stack(
-            [time_fraction(state), log_moneyness_scaled(state, self.sigma0), state.volatility / self.sigma0, delta],
-            dim=1,
-        )
-        return stacked, delta
+        columns = [time_fraction(state), log_moneyness_scaled(state, self.sigma0), state.volatility / self.sigma0, delta]
+        if self.include_running_pnl:
+            columns.append(running_pnl_scaled(state))
+        return torch.stack(columns, dim=1), delta
 
     def band(self, state: HedgeState) -> tuple[torch.Tensor, torch.Tensor]:
         stacked, delta = self.features(state)
@@ -90,5 +99,5 @@ class NoTransactionBandPolicy(nn.Module):
 POLICY_CLASSES: dict[str, type[nn.Module]] = {"mlp": MLPPolicy, "ntb": NoTransactionBandPolicy}
 
 
-def build_policy(name: str, sigma0: float, hidden_size: int, hidden_layers: int) -> nn.Module:
-    return POLICY_CLASSES[name](sigma0, hidden_size, hidden_layers)
+def build_policy(name: str, sigma0: float, hidden_size: int, hidden_layers: int, include_running_pnl: bool = False) -> nn.Module:
+    return POLICY_CLASSES[name](sigma0, hidden_size, hidden_layers, include_running_pnl)

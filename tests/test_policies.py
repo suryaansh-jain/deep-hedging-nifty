@@ -19,6 +19,8 @@ def make_state(n_paths: int = 64, h_prev: torch.Tensor | None = None) -> HedgeSt
         volatility=torch.full((n_paths,), 0.2),
         strike=1.0,
         rate=0.065,
+        wealth=torch.full((n_paths,), 0.02),
+        premium=0.02,
     )
 
 
@@ -68,3 +70,33 @@ def test_gradients_flow_through_recurrent_rollout() -> None:
         outcome.loss.mean().backward()
         gradient_norm = sum(float(parameter.grad.norm()) for parameter in policy.parameters() if parameter.grad is not None)
         assert np.isfinite(gradient_norm) and gradient_norm > 0
+
+
+def test_running_pnl_feature_is_optional_and_tracks_wealth() -> None:
+    torch.manual_seed(0)
+    plain = MLPPolicy(0.2)
+    extended = MLPPolicy(0.2, include_running_pnl=True)
+    state = make_state()
+    assert plain.features(state).shape == (64, 5)
+    features = extended.features(state)
+    assert features.shape == (64, 6)
+    richer = make_state()
+    richer.wealth = richer.wealth + 0.01
+    assert torch.allclose(extended.features(richer)[:, 5] - features[:, 5], torch.full((64,), 0.5))
+    band = NoTransactionBandPolicy(0.2, include_running_pnl=True)
+    assert band.features(state)[0].shape == (64, 5)
+
+
+def test_initial_wealth_equals_premium() -> None:
+    paths = GBMSimulator(0.2, 0.065, 21 / 252, 21).generate(8, 2)
+    prices, volatility = paths.to_torch()
+    seen: list[torch.Tensor] = []
+
+    def recorder(state: HedgeState) -> torch.Tensor:
+        seen.append(state.wealth.clone())
+        return torch.full_like(state.spot, 0.5)
+
+    run_hedge(prices, paths.times, recorder, 0.02, 1.0, 0.065, 0.0, volatility)
+    assert torch.allclose(seen[0], torch.full((8,), 0.02))
+    expected_second = (0.02 - 0.5) * np.exp(0.065 / 252) + 0.5 * prices[:, 1]
+    assert torch.allclose(seen[1], expected_second.float(), atol=1e-6)

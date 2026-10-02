@@ -106,6 +106,7 @@ class BaselinesConfig:
 class PolicyConfig:
     hidden_size: int
     hidden_layers: int
+    include_running_pnl: bool
 
 
 @dataclass
