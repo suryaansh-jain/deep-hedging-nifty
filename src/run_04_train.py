@@ -24,7 +24,7 @@ def train_grid(config: Config, simulator_name: str, policy_names: list[str], cos
         for cost_bps in cost_grid:
             seed_everything(config.seed)
             name = run_name(policy_name, simulator_name, cost_bps)
-            policy = build_policy(policy_name, sigma0, config.policy.hidden_size, config.policy.hidden_layers)
+            policy = build_policy(policy_name, sigma0, config.policy.hidden_size, config.policy.hidden_layers, config.policy.include_running_pnl)
             settings = settings_from_config(config, premium, cost_rate_from_bps(cost_bps))
             result = train_policy(policy, simulator, validation, settings, device, log_prefix=f"[{name}] ")
             metadata = {
@@ -33,6 +33,8 @@ def train_grid(config: Config, simulator_name: str, policy_names: list[str], cos
                 "cost_bps": float(cost_bps),
                 "sigma0": sigma0,
                 "premium": premium,
+                "include_running_pnl": config.policy.include_running_pnl,
+                "batch_size": config.training.batch_size,
                 "config": config.source_path,
             }
             save_training_result(result, name, config.paths.resolve("models"), config.paths.resolve("metrics") / "training_curves", metadata)

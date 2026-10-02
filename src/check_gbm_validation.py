@@ -110,11 +110,11 @@ def run_gbm_validation(config: Config) -> GbmValidationOutcome:
     simulator = GBMSimulator(sigma, config.gbm.mu, config.option.maturity, config.option.maturity_days)
     premium = atm_call_premium(rate, sigma, config.option.maturity)
     validation = simulator.generate(config.simulation.n_val_paths, config.simulation.val_seed)
-    policy = MLPPolicy(sigma, config.policy.hidden_size, config.policy.hidden_layers)
+    policy = MLPPolicy(sigma, config.policy.hidden_size, config.policy.hidden_layers, config.policy.include_running_pnl)
     settings = settings_from_config(config, premium, 0.0)
     result = train_policy(policy, simulator, validation, settings, device, log_prefix="[gbm mlp] ")
     name = run_name("mlp", "gbm", 0.0)
-    metadata = {"policy": "mlp", "simulator": "gbm", "cost_bps": 0.0, "sigma0": sigma, "premium": premium, "config": config.source_path}
+    metadata = {"policy": "mlp", "simulator": "gbm", "cost_bps": 0.0, "sigma0": sigma, "premium": premium, "include_running_pnl": config.policy.include_running_pnl, "config": config.source_path}
     save_training_result(result, name, config.paths.resolve("models"), config.paths.resolve("metrics") / "training_curves", metadata)
 
     test = simulator.generate(settings_gbm.n_test_paths, settings_gbm.test_seed)

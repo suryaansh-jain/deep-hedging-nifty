@@ -59,10 +59,11 @@ baselines:
 policy:
   hidden_size: 64
   hidden_layers: 3
+  include_running_pnl: true
 
 training:
-  max_epochs: 200
-  batch_size: 5000
+  max_epochs: 400
+  batch_size: 25000
   learning_rate: 0.001
   weight_decay: 0.0
   grad_clip: 1.0
