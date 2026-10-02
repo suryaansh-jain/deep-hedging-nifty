@@ -4,7 +4,7 @@ This file records the decisions taken where the spec leaves room, so every later
 
 ## Environment
 - Python 3.13 in a project-local `.venv` (spec asks for 3.10+). Dependencies pinned loosely in `requirements.txt`.
-- Device selection is `device: auto` in config: CUDA, then MPS, then CPU. Any value can be forced from config. Validation scripts default to CPU float64 where exactness matters (accounting checks); training runs in float32.
+- Device selection is `device: auto` in config: CUDA if available, otherwise CPU. Any device, including `mps`, can be forced from config. Validation scripts use CPU float64 where exactness matters (accounting checks); training runs in float32.
 
 ## Problem setup
 - Prices are normalized so S0 = 1 and K = 1 everywhere inside models. Reporting converts to percent of premium or percent of notional.
@@ -38,4 +38,6 @@ This file records the decisions taken where the spec leaves room, so every later
 - 84 fine steps over 21 days; rebalance counts {1, 2, 4, 7, 21, 84} all divide 84, so each coarser grid is an exact subsample of the same paths.
 
 ## Deviations from the spec
-- None intended. Anything that turns out to need a deviation will be added here with the reason.
+- `device: auto` skips MPS. Measured on this Mac (M-series, torch 2.14): one 50,000-path training epoch takes about 0.7 s on CPU against 1.4 s on MPS for the MLP and 0.6 s against 0.9 s for the band network, because the 21-step recurrent loop is dominated by kernel launch overhead. MPS is still selectable with `device: mps`.
+- The GARCH check against `arch` compares mean, std, quantiles and ACFs of absolute and squared returns, plus an exact check that the custom variance recursion reproduces `arch`'s own simulated volatility path. Kurtosis is reported but not used as a pass criterion: for the fitted parameters E[(alpha + gamma 1[z<0]) z^2 + beta]^2 is about 1.015, so the unconditional fourth moment is infinite and sample kurtosis does not converge.
+- `losses.py` and the GBM generator were created during Phase 1 because the baselines and the Checkpoint A experiment need them.
