@@ -1,0 +1,31 @@
+{
+  "fit_sample": {
+    "start": "2007-09-18",
+    "end": "2019-12-31",
+    "n_returns": 3000
+  },
+  "garch": {
+    "params": {
+      "mu": 0.04089325220888238,
+      "omega": 0.016800031909629504,
+      "alpha": 0.011064795740641321,
+      "gamma": 0.12939593364314272,
+      "beta": 0.9131411631029853,
+      "nu": 8.598587920242924
+    },
+    "persistence": 0.988903925665198,
+    "fourth_moment_factor": 1.014919148622557,
+    "unconditional_daily_variance_percent2": 1.5140518531799583,
+    "unconditional_annual_vol": 0.1953307622985559
+  },
+  "heston": {
+    "kappa": 3.0,
+    "theta": 0.04775565279611033,
+    "xi": 0.4,
+    "rho": -0.7,
+    "v0": 0.04775565279611033,
+    "mu": 0.065
+  },
+  "heston_feller_satisfied": true,
+  "realized_annual_vol_pre_test": 0.21853066786176795
+}

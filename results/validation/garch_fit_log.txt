@@ -1,0 +1,51 @@
+{
+  "fit_sample": {
+    "start": "2007-09-18",
+    "end": "2019-12-31",
+    "n_returns": 3000
+  },
+  "garch": {
+    "params": {
+      "mu": 0.04089325220888238,
+      "omega": 0.016800031909629504,
+      "alpha": 0.011064795740641321,
+      "gamma": 0.12939593364314272,
+      "beta": 0.9131411631029853,
+      "nu": 8.598587920242924
+    },
+    "persistence": 0.988903925665198,
+    "fourth_moment_factor": 1.014919148622557,
+    "unconditional_daily_variance_percent2": 1.5140518531799583,
+    "unconditional_annual_vol": 0.1953307622985559
+  },
+  "heston": {
+    "kappa": 3.0,
+    "theta": 0.04775565279611033,
+    "xi": 0.4,
+    "rho": -0.7,
+    "v0": 0.04775565279611033,
+    "mu": 0.065
+  },
+  "heston_feller_satisfied": true,
+  "realized_annual_vol_pre_test": 0.21853066786176795
+}
+                  custom    arch  historical_pre_test  fitted_model
+mean              0.0402  0.0413               0.0332        0.0409
+std               1.2431  1.2248               1.3764        1.2305
+excess_kurtosis 174.9898 30.1611              12.7602           NaN
+quantile_0.01    -3.2165 -3.2502              -3.8347           NaN
+quantile_0.05    -1.7084 -1.7137              -2.0236           NaN
+quantile_0.95     1.7884  1.7971               2.0089           NaN
+quantile_0.99     3.2995  3.3328               3.6359           NaN
+acf_sq_lag1       0.2816  0.3024               0.1424           NaN
+acf_abs_lag1      0.3226  0.3050               0.2579           NaN
+acf_sq_lag5       0.2778  0.2488               0.1430           NaN
+acf_abs_lag5      0.3087  0.2868               0.2745           NaN
+acf_sq_lag10      0.2170  0.2528               0.2128           NaN
+acf_abs_lag10     0.2900  0.2689               0.2855           NaN
+acf_sq_lag20      0.2426  0.2077               0.1081           NaN
+acf_abs_lag20     0.2615  0.2393               0.2471           NaN
+max relative difference between custom variance recursion and arch volatility path: 3.33e-16
+fourth moment factor E[(alpha + gamma 1[z<0]) z^2 + beta]^2 = 1.0149; above 1 means the unconditional kurtosis is infinite, so sample kurtosis and squared-return ACFs are not stable and are reported only
+garch: annualized std of daily returns 0.1922, terminal price 1%/50%/99% [0.8573, 1.0125, 1.1472], vol feature 5%/50%/95% [0.0957, 0.1437, 0.3215]
+heston: annualized std of daily returns 0.2182, terminal price 1%/50%/99% [0.8443, 1.0092, 1.1381], vol feature 5%/50%/95% [0.2185, 0.2185, 0.2185]
