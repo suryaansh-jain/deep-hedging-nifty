@@ -85,3 +85,7 @@ def call_vega_torch(spot: torch.Tensor, strike: torch.Tensor | float, tau: torch
     d1, _ = d1_d2_torch(spot, strike, tau, rate, sigma)
     tau_safe = torch.clamp(as_tensor_like(tau, spot), min=MIN_TIME)
     return spot * normal_pdf_torch(d1) * torch.sqrt(tau_safe)
+
+
+def atm_call_premium(rate: float, sigma: float, maturity: float) -> float:
+    return float(call_price_np(np.array(1.0), 1.0, maturity, rate, sigma))
