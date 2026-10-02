@@ -71,7 +71,7 @@ training:
   lr_patience: 8
   min_lr: 0.00001
   policies: [mlp, ntb]
-  heston_policy: ntb
+  heston_policy: auto
 
 validation:
   rebalance:
