@@ -7,7 +7,7 @@
   "include_running_pnl": true,
   "batch_size": 25000,
   "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-  "best_epoch": 148,
-  "best_val_cvar": 0.02465716190636158,
-  "seconds": 122.90457201004028
+  "best_epoch": 144,
+  "best_val_cvar": 0.024584714323282242,
+  "seconds": 127.88248705863953
 }

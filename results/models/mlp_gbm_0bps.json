@@ -6,7 +6,7 @@
   "premium": 0.02348453200278733,
   "include_running_pnl": true,
   "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
-  "best_epoch": 321,
-  "best_val_cvar": 0.007396932225674391,
-  "seconds": 181.19601607322693
+  "best_epoch": 259,
+  "best_val_cvar": 0.007477511186152697,
+  "seconds": 145.802903175354
 }
