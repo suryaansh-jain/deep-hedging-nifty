@@ -86,3 +86,9 @@ validation:
     n_test_paths: 20000
     test_seed: 40001
     target_mad: 0.05
+
+evaluation:
+  simulators: [garch, heston]
+  n_bootstrap: 1000
+  bootstrap_seed: 50001
+  sample_paths_saved: 200

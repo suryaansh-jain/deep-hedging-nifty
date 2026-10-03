@@ -25,9 +25,10 @@ This file records the decisions taken where the spec leaves room, so every later
 - sigma0 (used for the premium C0) is `auto` in config, resolved to the fitted GARCH unconditional annualized volatility saved by script 02. Phase 1 checks use explicit sigmas and do not depend on it.
 
 ## Policies and training
-- Feature scaling: ln(S/K) is divided by sigma0 sqrt(T); sigma_t is divided by sigma0; t/T, h_prev and bs_delta are passed as is. bs_delta uses the per-step conditional volatility and remaining time to maturity.
+- Feature scaling: ln(S/K) is divided by sigma0 sqrt(T) and clipped to [-5, 5]; the volatility input is ln(sigma_t / sigma0) clipped to [-2, 2]; t/T, h_prev and bs_delta are passed as is. bs_delta uses the per-step conditional volatility and remaining time to maturity.
+- Both networks also receive the running mark-to-market P&L, (cash + h_prev S - BS call value) / premium, clipped to [-5, 5]. This is an addition to the spec's MLP input list, agreed with the user after Checkpoint B, because CVaR-optimal hedges depend on how far a path already is into the loss tail.
 - No-transaction band: reference = clamp(bs_delta + correction, 0, 1); band = [reference - softplus(a), reference + softplus(b)]; h = clamp(h_prev, lower, upper), then clamped to [0, 1].
-- An epoch is 50,000 fresh paths, processed in minibatches (default 5,000). Validation set and test set are fixed by seed and shared by every strategy so comparisons are paired.
+- An epoch is 50,000 fresh paths, processed in minibatches of 25,000 (raised from 5,000 after a validation comparison at 5 bps; with 5,000 only about 250 tail paths drive each CVaR gradient). Validation set and test set are fixed by seed and shared by every strategy so comparisons are paired.
 - The Rockafellar-Uryasev w is a learnable scalar trained jointly with the network.
 
 ## Baselines
@@ -41,3 +42,4 @@ This file records the decisions taken where the spec leaves room, so every later
 - `device: auto` skips MPS. Measured on this Mac (M-series, torch 2.14): one 50,000-path training epoch takes about 0.7 s on CPU against 1.4 s on MPS for the MLP and 0.6 s against 0.9 s for the band network, because the 21-step recurrent loop is dominated by kernel launch overhead. MPS is still selectable with `device: mps`.
 - The GARCH check against `arch` compares mean, std, quantiles and ACFs of absolute and squared returns, plus an exact check that the custom variance recursion reproduces `arch`'s own simulated volatility path. Kurtosis is reported but not used as a pass criterion: for the fitted parameters E[(alpha + gamma 1[z<0]) z^2 + beta]^2 is about 1.015, so the unconditional fourth moment is infinite and sample kurtosis does not converge.
 - `losses.py` and the GBM generator were created during Phase 1 because the baselines and the Checkpoint A experiment need them.
+- Input clipping was added after the first Phase 4 evaluation. Inspection showed that in rare extreme GARCH states (simulated volatility above roughly 70 percent, about 0.7 percent of states) the unclipped networks extrapolated to a full hedge h = 1 while the index collapsed, producing worst-case losses of 24 to 32 premiums against 11 to 14 for BS delta. The flaw was first seen on the test set and then confirmed on the validation set, which is what the fix was judged on. The fix is a generic input bound, not a tuned parameter.

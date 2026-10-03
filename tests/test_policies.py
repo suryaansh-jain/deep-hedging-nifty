@@ -82,7 +82,10 @@ def test_running_pnl_feature_is_optional_and_tracks_wealth() -> None:
     assert features.shape == (64, 6)
     richer = make_state()
     richer.wealth = richer.wealth + 0.01
-    assert torch.allclose(extended.features(richer)[:, 5] - features[:, 5], torch.full((64,), 0.5))
+    unclipped = (features[:, 5].abs() < 4.0) & (extended.features(richer)[:, 5].abs() < 4.0)
+    shift = extended.features(richer)[:, 5] - features[:, 5]
+    assert unclipped.sum() > 50
+    assert torch.allclose(shift[unclipped], torch.full((int(unclipped.sum()),), 0.5))
     band = NoTransactionBandPolicy(0.2, include_running_pnl=True)
     assert band.features(state)[0].shape == (64, 5)
 
@@ -100,3 +103,13 @@ def test_initial_wealth_equals_premium() -> None:
     assert torch.allclose(seen[0], torch.full((8,), 0.02))
     expected_second = (0.02 - 0.5) * np.exp(0.065 / 252) + 0.5 * prices[:, 1]
     assert torch.allclose(seen[1], expected_second.float(), atol=1e-6)
+
+
+def test_features_are_bounded_in_extreme_states() -> None:
+    policy = MLPPolicy(0.2, include_running_pnl=True)
+    state = make_state()
+    state.spot = torch.full_like(state.spot, 0.05)
+    state.volatility = torch.full_like(state.spot, 5.0)
+    state.wealth = torch.full_like(state.spot, -1.0)
+    features = policy.features(state)
+    assert torch.all(features.abs() <= 5.0)

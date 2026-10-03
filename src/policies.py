@@ -9,9 +9,17 @@ from baselines import bs_delta_for_state
 from black_scholes import call_price_torch
 from hedging_env import HedgeState
 
+FEATURE_CLIP = 5.0
+LOG_VOLATILITY_CLIP = 2.0
+
 
 def log_moneyness_scaled(state: HedgeState, sigma0: float) -> torch.Tensor:
-    return torch.log(state.spot / state.strike) / (sigma0 * math.sqrt(state.maturity))
+    scaled = torch.log(state.spot / state.strike) / (sigma0 * math.sqrt(state.maturity))
+    return torch.clamp(scaled, -FEATURE_CLIP, FEATURE_CLIP)
+
+
+def volatility_scaled(state: HedgeState, sigma0: float) -> torch.Tensor:
+    return torch.clamp(torch.log(torch.clamp(state.volatility, min=1e-6) / sigma0), -LOG_VOLATILITY_CLIP, LOG_VOLATILITY_CLIP)
 
 
 def time_fraction(state: HedgeState) -> torch.Tensor:
@@ -20,7 +28,7 @@ def time_fraction(state: HedgeState) -> torch.Tensor:
 
 def running_pnl_scaled(state: HedgeState) -> torch.Tensor:
     option_value = call_price_torch(state.spot, state.strike, state.time_to_maturity, state.rate, state.volatility)
-    return (state.wealth - option_value) / state.premium
+    return torch.clamp((state.wealth - option_value) / state.premium, -FEATURE_CLIP, FEATURE_CLIP)
 
 
 def build_mlp(input_size: int, output_size: int, hidden_size: int, hidden_layers: int) -> nn.Sequential:
@@ -35,7 +43,7 @@ def build_mlp(input_size: int, output_size: int, hidden_size: int, hidden_layers
 
 class MLPPolicy(nn.Module):
     name = "mlp"
-    base_feature_names = ("t_over_T", "log_moneyness_scaled", "h_prev", "sigma_scaled", "bs_delta")
+    base_feature_names = ("t_over_T", "log_moneyness_scaled", "h_prev", "log_sigma_ratio", "bs_delta")
 
     def __init__(self, sigma0: float, hidden_size: int = 64, hidden_layers: int = 3, include_running_pnl: bool = False) -> None:
         super().__init__()
@@ -49,7 +57,7 @@ class MLPPolicy(nn.Module):
             time_fraction(state),
             log_moneyness_scaled(state, self.sigma0),
             state.h_prev,
-            state.volatility / self.sigma0,
+            volatility_scaled(state, self.sigma0),
             bs_delta_for_state(state),
         ]
         if self.include_running_pnl:
@@ -62,7 +70,7 @@ class MLPPolicy(nn.Module):
 
 class NoTransactionBandPolicy(nn.Module):
     name = "ntb"
-    base_feature_names = ("t_over_T", "log_moneyness_scaled", "sigma_scaled", "bs_delta")
+    base_feature_names = ("t_over_T", "log_moneyness_scaled", "log_sigma_ratio", "bs_delta")
     initial_band_logit = -3.0
 
     def __init__(self, sigma0: float, hidden_size: int = 64, hidden_layers: int = 3, include_running_pnl: bool = False) -> None:
@@ -78,7 +86,7 @@ class NoTransactionBandPolicy(nn.Module):
 
     def features(self, state: HedgeState) -> tuple[torch.Tensor, torch.Tensor]:
         delta = bs_delta_for_state(state)
-        columns = [time_fraction(state), log_moneyness_scaled(state, self.sigma0), state.volatility / self.sigma0, delta]
+        columns = [time_fraction(state), log_moneyness_scaled(state, self.sigma0), volatility_scaled(state, self.sigma0), delta]
         if self.include_running_pnl:
             columns.append(running_pnl_scaled(state))
         return torch.stack(columns, dim=1), delta
