@@ -5,3 +5,4 @@ __pycache__/
 .DS_Store
 logs/
 data/processed/*.npz
+data/processed/dashboard/
