@@ -18,7 +18,6 @@ streamlit run app/dashboard.py
 |---|---|---|---|
 | ![](docs/screenshots/overview.png) | ![](docs/screenshots/hedge_paths.png) | ![](docs/screenshots/frontier.png) | ![](docs/screenshots/real_data.png) |
 
-Screenshot placeholders: save captures of the four tabs to `docs/screenshots/` with the file names above.
 
 The sidebar has a transaction-cost slider over the cost grid (0, 2, 5, 10, 25 and 50 bps), a simulator selector (GARCH or Heston) and a deep-policy selector (band network or MLP). Every view updates with the slider. The dashboard only reads precomputed files from `data/processed/dashboard/`; nothing is trained at runtime.
 
