@@ -156,6 +156,13 @@ class EvaluationConfig:
 
 
 @dataclass
+class RealDataConfig:
+    simulator_models: str
+    n_bootstrap: int
+    bootstrap_seed: int
+
+
+@dataclass
 class Config:
     seed: int
     device: str
@@ -173,6 +180,7 @@ class Config:
     training: TrainingConfig
     validation: ValidationConfig
     evaluation: EvaluationConfig
+    real_data: RealDataConfig
     source_path: str = field(default="")
 
 

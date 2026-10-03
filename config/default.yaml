@@ -92,3 +92,8 @@ evaluation:
   n_bootstrap: 1000
   bootstrap_seed: 50001
   sample_paths_saved: 200
+
+real_data:
+  simulator_models: garch
+  n_bootstrap: 1000
+  bootstrap_seed: 60001
