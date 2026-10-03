@@ -2,7 +2,7 @@
 
 Deep hedging of a short Nifty 50 at-the-money call under proportional transaction costs. A neural policy is trained to minimise CVaR95 of the hedging loss on simulated Nifty paths, then compared with Black-Scholes delta hedging, a tuned no-trade-band delta hedge and no hedge, on 100,000 simulated test paths and on real Nifty history since 2020.
 
-**Headline result (GJR-GARCH simulator, 100,000 test paths, same paths for every strategy).** At the default 5 bps cost, the no-transaction-band network cuts CVaR95 of the loss from 1.411 to 1.304 premiums (−7.6%) and mean trading cost from 0.051 to 0.034 premiums (−34%) compared with daily BS delta hedging. At 50 bps the CVaR95 gap widens to 1.672 against 1.901 premiums (−12.1%) and costs fall from 0.505 to 0.295 premiums (−42%). Every paired-bootstrap 95% interval for the CVaR95 difference excludes zero, against both BS delta and the tuned band baseline. The price of this is a fatter extreme tail: std and CVaR99 are worse than BS delta on GARCH (see [Results](#results) and [Known limitations](#known-limitations)). On 79 independent windows of real Nifty data, the point estimates favour the deep hedges, but no interval excludes zero.
+**Headline result (GJR-GARCH simulator, 100,000 test paths, same paths for every strategy).** At the default 5 bps cost, the no-transaction-band network cuts CVaR95 of the loss from 1.411 to 1.304 premiums (−7.6%) and mean trading cost from 0.051 to 0.034 premiums (−34%) compared with daily BS delta hedging. At 50 bps the CVaR95 gap widens to 1.672 against 1.901 premiums (−12.1%) and costs fall from 0.505 to 0.295 premiums (−42%). Every paired-bootstrap 95% interval for the CVaR95 difference excludes zero, against both BS delta and the tuned band baseline. The price of this is a fatter extreme tail: std and CVaR99 are worse than BS delta on GARCH. A second variant trained on CVaR95 + 0.5 x CVaR99 fixes most of that: it beats BS delta on both CVaR95 and CVaR99 at every cost level on both simulators, for a smaller CVaR95 gain (see [Fixing the extreme tail](#fixing-the-extreme-tail-cvar95--05-x-cvar99)). On 79 independent windows of real Nifty data, the point estimates favour the deep hedges, but no interval excludes zero.
 
 One premium here is C0 = 0.0252 S0, the BS price of the 21-day ATM call at the fitted unconditional volatility of 19.5% and r = 6.5%. With Nifty at 22,422 (close on 2026-10-01), one premium is about 566 index points.
 
@@ -94,6 +94,23 @@ The deep hedges trade a lower CVaR95 and lower cost for a higher std, a higher C
 
 On Heston the band network is also better than BS delta on CVaR99 at every cost. The premium is priced at 19.5% volatility while Heston runs at 21.9%, so Heston levels are not comparable with GARCH levels; strategy rankings within Heston are.
 
+### Fixing the extreme tail: CVaR95 + 0.5 x CVaR99
+
+The CVaR95-trained networks have a worse extreme tail than BS delta on GARCH (higher CVaR99, worst path 32 premiums against 14). The cause: CVaR95 weights every loss beyond the 95% line equally, and the roughly 0.1% of paths that go deep into the tail give too little signal to pin the hedge down there; on paths whose running P&L is below about -4 premiums the band network held about 0.85 more index than delta. Input clipping and removing the drift did not fix it. A second band network (`ntb_tail`) is trained on CVaR95 + 0.5 x CVaR99, with its own Rockafellar-Uryasev threshold for each term and early stopping on the same combined objective. The weight 0.5 was fixed before training, not tuned.
+
+GJR-GARCH test set, CVaR95 / CVaR99 in premiums:
+
+| cost (bps) | BS delta | band net, CVaR95 | band net, CVaR95 + 0.5 CVaR99 | its mean cost | its CVaR95 − BS delta [95% CI] |
+|---|---|---|---|---|---|
+| 0 | 1.359 / 2.731 | 1.256 / 3.071 | 1.321 / 2.675 | 0.000 | −0.038 [−0.059, −0.016] |
+| 2 | 1.380 / 2.752 | 1.274 / 3.069 | 1.337 / 2.691 | 0.015 | −0.042 [−0.064, −0.020] |
+| 5 | 1.411 / 2.784 | 1.304 / 3.019 | 1.358 / 2.723 | 0.037 | −0.053 [−0.074, −0.030] |
+| 10 | 1.464 / 2.838 | 1.350 / 3.137 | 1.406 / 2.765 | 0.072 | −0.057 [−0.079, −0.035] |
+| 25 | 1.624 / 3.001 | 1.473 / 3.253 | 1.522 / 2.894 | 0.172 | −0.102 [−0.126, −0.078] |
+| 50 | 1.901 / 3.279 | 1.672 / 3.480 | 1.708 / 3.086 | 0.303 | −0.193 [−0.218, −0.167] |
+
+The tail-aware network beats BS delta on both CVaR95 and CVaR99 at every cost, and its CVaR95 advantage still grows with cost, from 0.04 to 0.19 premiums. It gives back about half of the CVaR95 gain at low costs and much less at 50 bps. Its std (0.52 at 5 bps) sits between BS delta (0.48) and the CVaR95 network (0.60). The single worst GARCH path improves from 32 to 25.5 premiums but is still worse than BS delta's 14.1, so one path out of 100,000 remains a weakness. On Heston it also beats BS delta on both measures at every cost (CVaR99 0.762 against 0.916 at 5 bps).
+
 ### Real Nifty data (sanity check, small sample)
 
 **79 independent non-overlapping 21-day windows**, starting from 2020-01-01 to 2026-08-17. The premium at each window start is BS at India VIX / 100; strategy features use GARCH volatility filtered with parameters frozen from the pre-2020 fit; the models are the ones trained on simulated GARCH paths. CVaR95 here is the mean of the worst 4 windows.
@@ -117,7 +134,7 @@ The point estimates favour both deep hedges, but every interval includes zero: 7
 
 ## Known limitations
 
-- **Worse extreme tail on GARCH.** CVaR95 treats every loss beyond the 95% quantile linearly, and the roughly 0.1% of paths that end up deep in the tail give the network very little training signal. On paths whose running P&L is below about −4 premiums, the band network holds about 0.85 more index than delta as the index keeps falling. As a result, the worst GARCH test path loses 32 premiums against 14 for BS delta, and CVaR99 is worse than delta at every cost (3.02 against 2.78 at 5 bps). Input clipping and removing the drift did not fix this. A mixed objective (for example CVaR95 plus a CVaR99 term) is the natural next step. The Heston results do not show this effect.
+- **Extreme tail on GARCH.** The CVaR95-only networks have a worse CVaR99 and worst case than BS delta on GARCH. The CVaR95 + 0.5 x CVaR99 variant fixes CVaR99 at every cost but its single worst path (25.5 premiums) is still worse than BS delta's (14.1), and it gives up part of the CVaR95 gain. Which objective to deploy is a risk-preference choice; both are reported.
 - **Daily rebalancing only**, one option type (ATM call), one maturity (21 trading days).
 - **Illustrative Heston parameters**, not calibrated to Nifty option prices.
 - **Illustrative cost parameters.** Real Indian trading costs (brokerage, STT, exchange and SEBI charges, stamp duty, GST, bid-ask and slippage) vary by instrument, broker and size. The 0 to 50 bps sweep is meant to cover the plausible range; no specific figure here is a claim about actual costs.
@@ -163,7 +180,7 @@ python src/run_01_fetch_data.py           # Nifty and India VIX to data/raw (cac
 python src/run_02_fit_simulators.py       # GARCH fit on pre-2020 data, Heston parameters
 python src/run_03_baselines.py            # band width search per cost level
 python src/check_rebalance_scaling.py     # Checkpoint A
-python src/run_04_train.py                # 12 GARCH runs + 6 Heston runs (about 45 min on a laptop CPU)
+python src/run_04_train.py                # 30 runs: MLP and band net on GARCH, band net on Heston, CVaR99 variant on both (about 1 h on a laptop CPU)
 python src/check_gbm_validation.py        # Checkpoint B
 python src/run_05_evaluate.py             # test metrics, bootstrap, figures
 python src/run_06_real_data.py            # real-data windows
