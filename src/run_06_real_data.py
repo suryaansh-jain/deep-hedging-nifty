@@ -18,7 +18,7 @@ from real_data_test import RealWindows, build_windows, run_real_windows
 from simulators import GarchParams
 
 COMPARISON_BASELINES = ("bs_delta", "delta_band")
-STRATEGY_COLORS = {"unhedged": "#9e9e9e", "bs_delta": "#1f77b4", "delta_band": "#2ca02c", "mlp": "#ff7f0e", "ntb": "#d62728"}
+STRATEGY_COLORS = {"unhedged": "#9e9e9e", "bs_delta": "#1f77b4", "delta_band": "#2ca02c", "mlp": "#ff7f0e", "ntb": "#d62728", "ntb_tail": "#9467bd"}
 
 
 def summarize_windows(outputs: dict[str, np.ndarray]) -> dict[str, float]:
@@ -64,7 +64,7 @@ def evaluate_windows(config: Config, windows: RealWindows, label: str, band_widt
 def plot_real_histogram(saved: dict, cost_bps: float, n_windows: int, path: str) -> None:
     figure, axis = plt.subplots(figsize=(8, 5))
     bins = np.linspace(-6, 2, 41)
-    for name in ["unhedged", "bs_delta", "delta_band", "mlp", "ntb"]:
+    for name in ["unhedged", "bs_delta", "delta_band", "mlp", "ntb", "ntb_tail"]:
         key = f"non_overlapping__pnl__{name}__{cost_bps:g}"
         if key in saved:
             axis.hist(np.clip(saved[key], bins[0], bins[-1]), bins=bins, histtype="step", linewidth=1.6, color=STRATEGY_COLORS[name], label=STRATEGY_LABELS[name])

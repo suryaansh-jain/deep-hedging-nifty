@@ -16,8 +16,9 @@ STRATEGY_LABELS = {
     "delta_band": "Delta + no-trade band",
     "mlp": "Deep hedge (MLP)",
     "ntb": "Deep hedge (band network)",
+    "ntb_tail": "Deep hedge (band net, CVaR95+99)",
 }
-STRATEGY_COLORS = {"unhedged": "#9e9e9e", "bs_delta": "#1f77b4", "delta_band": "#2ca02c", "mlp": "#ff7f0e", "ntb": "#d62728"}
+STRATEGY_COLORS = {"unhedged": "#9e9e9e", "bs_delta": "#1f77b4", "delta_band": "#2ca02c", "mlp": "#ff7f0e", "ntb": "#d62728", "ntb_tail": "#9467bd"}
 BASELINES = ("unhedged", "bs_delta", "delta_band")
 METRIC_COLUMNS = {
     "mean_pnl_x_premium": "Mean P&L",
@@ -125,7 +126,7 @@ def main() -> None:
     test_metrics = tables["test_metrics"]
     simulator_metrics = test_metrics[test_metrics["simulator"] == simulator]
     available = set(simulator_metrics["strategy"])
-    deep_options = [name for name in ("ntb", "mlp") if name in available]
+    deep_options = [name for name in ("ntb", "ntb_tail", "mlp") if name in available]
     policy = st.sidebar.selectbox("Deep hedging policy", deep_options, format_func=lambda name: STRATEGY_LABELS[name])
     strategies = shown_strategies(policy, available)
     st.sidebar.caption(f"All values are in units of the option premium C0 = {premium:.4f} x S0 (sigma0 = {manifest['sigma0']:.3f}, r = {manifest['rate']}). Costs are illustrative.")

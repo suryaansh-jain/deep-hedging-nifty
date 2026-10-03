@@ -17,13 +17,14 @@ from policies import build_policy
 from train import run_name
 
 LOSS_THRESHOLD_FRACTION = 0.05
-DEEP_STRATEGIES = ("mlp", "ntb")
+DEEP_STRATEGIES = ("mlp", "ntb", "ntb_tail")
 STRATEGY_LABELS = {
     "unhedged": "Unhedged",
     "bs_delta": "BS delta",
     "delta_band": "Delta + no-trade band",
     "mlp": "Deep hedge (MLP)",
     "ntb": "Deep hedge (band network)",
+    "ntb_tail": "Deep hedge (band net, CVaR95+99)",
 }
 
 

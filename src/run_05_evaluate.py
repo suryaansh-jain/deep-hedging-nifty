@@ -26,7 +26,7 @@ from evaluate import (
 from simulators import build_simulator
 
 COMPARISON_BASELINES = ("bs_delta", "delta_band")
-STRATEGY_COLORS = {"unhedged": "#9e9e9e", "bs_delta": "#1f77b4", "delta_band": "#2ca02c", "mlp": "#ff7f0e", "ntb": "#d62728"}
+STRATEGY_COLORS = {"unhedged": "#9e9e9e", "bs_delta": "#1f77b4", "delta_band": "#2ca02c", "mlp": "#ff7f0e", "ntb": "#d62728", "ntb_tail": "#9467bd"}
 
 
 def evaluate_simulator(config: Config, simulator_name: str, premium: float, band_widths: dict) -> tuple[list[dict], list[dict], dict]:
@@ -148,8 +148,8 @@ def plot_sample_path(saved: dict, simulator_name: str, cost_bps: float, path_ind
 
 def plot_training_curves(config: Config, path: Path) -> None:
     curves_directory = config.paths.resolve("metrics") / "training_curves"
-    figure, axes = plt.subplots(1, 3, figsize=(16, 4.5))
-    panels = [("mlp", "garch"), ("ntb", "garch"), ("ntb", "heston")]
+    panels = [("mlp", "garch"), ("ntb", "garch"), ("ntb_tail", "garch"), ("ntb", "heston")]
+    figure, axes = plt.subplots(1, len(panels), figsize=(5.3 * len(panels), 4.5))
     colors = plt.cm.viridis(np.linspace(0, 0.9, len(config.costs.cost_grid)))
     for axis, (policy_name, simulator_name) in zip(axes, panels):
         for color, cost_bps in zip(colors, config.costs.cost_grid):
@@ -160,7 +160,7 @@ def plot_training_curves(config: Config, path: Path) -> None:
             axis.plot(curve["epoch"], curve["val_cvar"], color=color, label=f"{cost_bps:g} bps")
         axis.set_title(f"{STRATEGY_LABELS[policy_name]}, {simulator_name.upper()}")
         axis.set_xlabel("epoch")
-        axis.set_ylabel("validation CVaR95")
+        axis.set_ylabel("validation objective (raw units)")
         axis.grid(alpha=0.3)
     axes[0].legend(fontsize=8)
     figure.tight_layout()
