@@ -20,7 +20,7 @@ def make_state(n_paths: int = 64, h_prev: torch.Tensor | None = None) -> HedgeSt
         strike=1.0,
         rate=0.065,
         wealth=torch.full((n_paths,), 0.02),
-        premium=0.02,
+        premium=torch.full((n_paths,), 0.02),
     )
 
 

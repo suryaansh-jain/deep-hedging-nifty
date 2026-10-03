@@ -85,7 +85,7 @@ def to_result(name: str, outcome: HedgeOutcome) -> StrategyResult:
     )
 
 
-def run_strategies(strategies: dict[str, object], prices: torch.Tensor, volatility: torch.Tensor, times: np.ndarray, premium: float, rate: float, cost_rate: float) -> dict[str, StrategyResult]:
+def run_strategies(strategies: dict[str, object], prices: torch.Tensor, volatility: torch.Tensor, times: np.ndarray, premium: float | torch.Tensor, rate: float, cost_rate: float) -> dict[str, StrategyResult]:
     return {name: to_result(name, run_policy(policy, prices, times, volatility, premium, 1.0, rate, cost_rate)) for name, policy in strategies.items()}
 
 

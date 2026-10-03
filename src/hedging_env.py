@@ -21,7 +21,7 @@ class HedgeState:
     strike: float
     rate: float
     wealth: torch.Tensor
-    premium: float
+    premium: torch.Tensor
 
 
 Policy = Callable[[HedgeState], torch.Tensor]
@@ -71,7 +71,8 @@ def run_hedge(
     maturity = grid[-1]
     n_paths = prices.shape[0]
     h_prev = torch.zeros(n_paths, dtype=prices.dtype, device=prices.device)
-    cash = torch.as_tensor(premium, dtype=prices.dtype, device=prices.device).expand(n_paths).clone()
+    premium_per_path = torch.as_tensor(premium, dtype=prices.dtype, device=prices.device).expand(n_paths).clone()
+    cash = premium_per_path.clone()
     positions: list[torch.Tensor] = []
     costs: list[torch.Tensor] = []
     for step in range(n_steps):
@@ -89,7 +90,7 @@ def run_hedge(
             strike=strike,
             rate=rate,
             wealth=cash + h_prev * spot,
-            premium=float(premium),
+            premium=premium_per_path,
         )
         h_new = policy(state)
         trade = h_new - h_prev
