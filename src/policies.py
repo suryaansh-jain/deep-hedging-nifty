@@ -104,7 +104,7 @@ class NoTransactionBandPolicy(nn.Module):
         return torch.minimum(torch.maximum(state.h_prev, lower), upper)
 
 
-POLICY_CLASSES: dict[str, type[nn.Module]] = {"mlp": MLPPolicy, "ntb": NoTransactionBandPolicy}
+POLICY_CLASSES: dict[str, type[nn.Module]] = {"mlp": MLPPolicy, "ntb": NoTransactionBandPolicy, "ntb_tail": NoTransactionBandPolicy}
 
 
 def build_policy(name: str, sigma0: float, hidden_size: int, hidden_layers: int, include_running_pnl: bool = False) -> nn.Module:

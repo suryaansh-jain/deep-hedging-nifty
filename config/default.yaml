@@ -73,6 +73,9 @@ training:
   min_lr: 0.00001
   policies: [mlp, ntb]
   heston_policy: auto
+  tail_policies: [ntb_tail]
+  tail_alpha: 0.99
+  tail_weight: 0.5
 
 validation:
   rebalance:

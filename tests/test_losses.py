@@ -40,3 +40,14 @@ def test_rockafellar_uryasev_minimized_by_learning_threshold() -> None:
         learned = float(loss_module(losses))
     assert abs(learned - exact) < 2e-3
     assert learned >= exact - 1e-9
+
+
+def test_tail_weighted_loss_matches_exact_at_var_thresholds() -> None:
+    from losses import TailWeightedCVaRLoss, exact_tail_weighted_cvar
+
+    losses = torch.tensor(np.random.default_rng(3).standard_t(4, size=20000))
+    module = TailWeightedCVaRLoss(0.95, 0.99, 0.5, value_at_risk_np(losses.numpy(), 0.95), value_at_risk_np(losses.numpy(), 0.99))
+    with torch.no_grad():
+        value = float(module(losses))
+    assert abs(value - float(exact_tail_weighted_cvar(losses, 0.95, 0.99, 0.5))) < 1e-9
+    assert len(list(module.parameters())) == 2

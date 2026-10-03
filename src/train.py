@@ -13,7 +13,7 @@ import torch
 from torch import nn
 
 from hedging_env import run_hedge
-from losses import CVaRLoss, exact_cvar, value_at_risk_np
+from losses import CVaRLoss, TailWeightedCVaRLoss, exact_tail_weighted_cvar, value_at_risk_np
 from config import Config
 from simulators import SimulatedPaths
 
@@ -39,6 +39,8 @@ class TrainingSettings:
     lr_patience: int
     min_lr: float
     train_seed_base: int
+    tail_alpha: float = 0.99
+    tail_weight: float = 0.0
 
 
 @dataclass
@@ -62,7 +64,13 @@ def evaluate_cvar(policy: nn.Module, prices: torch.Tensor, volatility: torch.Ten
     with torch.no_grad():
         losses = hedge_losses(policy, (prices, volatility), times, settings)
     policy.train()
-    return float(exact_cvar(losses, settings.alpha)), float(-losses.mean())
+    return float(exact_tail_weighted_cvar(losses, settings.alpha, settings.tail_alpha, settings.tail_weight)), float(-losses.mean())
+
+
+def build_loss(settings: TrainingSettings, initial_threshold: float, initial_tail_threshold: float) -> nn.Module:
+    if settings.tail_weight > 0:
+        return TailWeightedCVaRLoss(settings.alpha, settings.tail_alpha, settings.tail_weight, initial_threshold, initial_tail_threshold)
+    return CVaRLoss(settings.alpha, initial_threshold)
 
 
 def train_policy(
@@ -79,7 +87,8 @@ def train_policy(
     val_prices, val_volatility = validation.to_torch(device=device)
     with torch.no_grad():
         initial_losses = hedge_losses(policy, (val_prices, val_volatility), times, settings)
-    cvar_loss = CVaRLoss(settings.alpha, value_at_risk_np(initial_losses.cpu().numpy(), settings.alpha)).to(device)
+    initial_numpy = initial_losses.cpu().numpy()
+    cvar_loss = build_loss(settings, value_at_risk_np(initial_numpy, settings.alpha), value_at_risk_np(initial_numpy, settings.tail_alpha)).to(device)
     optimizer = torch.optim.Adam(
         list(policy.parameters()) + list(cvar_loss.parameters()), lr=settings.learning_rate, weight_decay=settings.weight_decay
     )

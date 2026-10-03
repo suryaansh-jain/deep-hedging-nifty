@@ -39,3 +39,22 @@ class CVaRLoss(nn.Module):
 
     def forward(self, losses: torch.Tensor) -> torch.Tensor:
         return rockafellar_uryasev_cvar(losses, self.threshold.to(losses.dtype), self.alpha)
+
+
+class TailWeightedCVaRLoss(nn.Module):
+    def __init__(self, alpha: float, tail_alpha: float, tail_weight: float, initial_threshold: float = 0.0, initial_tail_threshold: float = 0.0) -> None:
+        super().__init__()
+        self.body = CVaRLoss(alpha, initial_threshold)
+        self.tail = CVaRLoss(tail_alpha, initial_tail_threshold)
+        self.tail_weight = tail_weight
+
+    @property
+    def threshold(self) -> nn.Parameter:
+        return self.body.threshold
+
+    def forward(self, losses: torch.Tensor) -> torch.Tensor:
+        return self.body(losses) + self.tail_weight * self.tail(losses)
+
+
+def exact_tail_weighted_cvar(losses: torch.Tensor, alpha: float, tail_alpha: float, tail_weight: float) -> torch.Tensor:
+    return exact_cvar(losses, alpha) + tail_weight * exact_cvar(losses, tail_alpha)

@@ -122,6 +122,9 @@ class TrainingConfig:
     min_lr: float
     policies: list[str]
     heston_policy: str
+    tail_policies: list[str]
+    tail_alpha: float
+    tail_weight: float
 
 
 @dataclass
