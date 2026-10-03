@@ -1,0 +1,14 @@
+{
+  "policy": "ntb_tail",
+  "simulator": "garch",
+  "cost_bps": 10.0,
+  "sigma0": 0.1953307622985559,
+  "premium": 0.025235882581654878,
+  "include_running_pnl": true,
+  "batch_size": 25000,
+  "objective": "CVaR0.95 + 0.5 x CVaR0.99",
+  "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
+  "best_epoch": 33,
+  "best_val_cvar": 0.06725511699914932,
+  "seconds": 57.941301584243774
+}

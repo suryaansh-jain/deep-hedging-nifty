@@ -1,0 +1,14 @@
+{
+  "policy": "ntb_tail",
+  "simulator": "heston",
+  "cost_bps": 10.0,
+  "sigma0": 0.1953307622985559,
+  "premium": 0.025235882581654878,
+  "include_running_pnl": true,
+  "batch_size": 25000,
+  "objective": "CVaR0.95 + 0.5 x CVaR0.99",
+  "config": "/Users/suryaansh/projects/deep-hedging-nifty/config/default.yaml",
+  "best_epoch": 100,
+  "best_val_cvar": 0.026902519166469574,
+  "seconds": 108.7592499256134
+}
