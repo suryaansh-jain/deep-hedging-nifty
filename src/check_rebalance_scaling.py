@@ -90,6 +90,35 @@ def plot_scaling(table: pd.DataFrame, path: str) -> None:
     plt.close(figure)
 
 
+def markdown_report(table: pd.DataFrame, verdict: ScalingVerdict, tolerance: float, config: Config) -> str:
+    settings = config.validation.rebalance
+    header = "| n | std P&L | std x sqrt(n) | mean P&L | std / std(n=1) | mean / std |\n|---|---|---|---|---|---|"
+    rows = "\n".join(
+        f"| {row.n} | {row.std_pnl:.6f} | {row.std_times_sqrt_n:.6f} | {row.mean_pnl:.6f} | {row.ratio_to_n1_std:.4f} | {row.mean_over_std:.4f} |"
+        for row in table.itertuples()
+    )
+    passed = verdict.passed(tolerance)
+    return "\n".join(
+        [
+            "# Checkpoint A: rebalance scaling of the BS delta hedge",
+            "",
+            f"GBM, {settings.n_paths} paths, sigma = {settings.sigma}, mu = r = {config.option.r}, {settings.fine_steps} fine steps over {config.option.maturity_days} trading days, c = 0, ATM call, seed {settings.seed}. The same paths are used for every n.",
+            "",
+            header,
+            rows,
+            "",
+            f"- Std decreases monotonically in n: {verdict.monotone}",
+            f"- Max deviation of std x sqrt(n) from its median: {verdict.scaled_std_spread:.3f} (limit {tolerance})",
+            f"- Max |mean P&L| / std: {verdict.max_abs_mean_to_std:.4f} (limit {MEAN_TO_STD_LIMIT})",
+            "",
+            f"**{'PASS' if passed else 'FAIL'}**",
+            "",
+            "Plot: `results/validation/rebalance_scaling.png`.",
+            "",
+        ]
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default=None)
@@ -103,6 +132,7 @@ def main() -> int:
     verdict = judge(table)
     tolerance = config.validation.rebalance.tolerance
     passed = verdict.passed(tolerance)
+    (output_directory / "rebalance_scaling.md").write_text(markdown_report(table, verdict, tolerance, config))
     with pd.option_context("display.float_format", "{:.6f}".format, "display.width", 120):
         print(table.to_string(index=False))
     print(f"monotone decrease: {verdict.monotone}")
